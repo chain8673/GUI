@@ -1,3 +1,4 @@
+import pymysql
 from PySide2.QtWidgets import QMainWindow, QTextEdit, QApplication, QPushButton, QRadioButton, QButtonGroup, QLabel, \
     QComboBox
 
@@ -9,7 +10,38 @@ if __name__ == "__main__":
         data.append(cb.currentText())
         data.append(textEdit2.toPlainText())
         print(data)
+        writeToDB('user', data)
         data.clear()
+
+
+    # 将UI上采集的数据存入数据库
+    def writeToDB(tableName, data):
+        conn = pymysql.connect(host='localhost', user='root', password='root', database='testdb', charset='utf8')
+        cursor = conn.cursor()
+
+        # 定义要执行的SQL语句
+        # sql = """
+        # CREATE TABLE """ + tableName + """ (
+        # id INT auto_increment PRIMARY KEY ,
+        # name CHAR(50) NOT NULL,
+        # gender CHAR(10) NOT NULL,
+        # education CHAR(20) NOT NULL,
+        # descption CHAR(100)
+        # )ENGINE=innodb DEFAULT CHARSET=utf8;
+        # """
+        #
+        # cursor.execute(sql)  # 执行SQL语句
+
+        sql2 = 'INSERT INTO ' + tableName + '(name, gender, education, descption) VALUES ("' + data[0] + '", "' + data[
+            1] + '", "' + data[2] + '",  "' + data[3] + '");'
+
+        cursor.execute(sql2)  # 执行SQL语句
+
+        cursor.close()  # 关闭光标对象
+
+        conn.commit()  # 提交事务
+
+        conn.close()  # 关闭数据库连接
 
 app = QApplication([])
 window = QMainWindow()
@@ -59,7 +91,7 @@ textEdit2.move(100, 210)
 
 # 按钮
 button = QPushButton('Submit', window)
-button.move(300, 100)
+button.move(300, 340)
 button.clicked.connect(test)
 
 window.show()
